@@ -44,7 +44,7 @@ func (p *Prover) ComputeAndSendNextPolynomial(v *Verifier) {
 		return sum
 	}
 
-	v.RecievePolynomials(FuncType(gJ))
+	v.RecievePolynomials(gJ)
 	p.round++
 }
 

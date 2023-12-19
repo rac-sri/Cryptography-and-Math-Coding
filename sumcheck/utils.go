@@ -2,12 +2,25 @@ package sumcheck
 
 import (
 	"math"
+	"reflect"
 	"strconv"
 )
 
 // Arity returns the number of arguments taken by a function.
 // In Go, we need to define a specific function type.
 type FuncType func(...int) int
+
+func Arity(f interface{}) int {
+    // Get the type of f, which should be a function.
+    fType := reflect.TypeOf(f)
+    if fType.Kind() != reflect.Func {
+        // Optionally, handle the case where f is not a function.
+        return -1
+    }
+    // Return the number of input arguments.
+    return fType.NumIn()
+}
+
 
 // returns n as a binary vector, front-padded to pad_to_len
 // The use of ToBits is crucial for generating the necessary input patterns to
