@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// TODO: add assertions
 func TestSumcheck(t *testing.T) {
 	
 	g := func(args ...int) int 	{ 
