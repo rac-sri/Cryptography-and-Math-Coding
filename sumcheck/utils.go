@@ -11,30 +11,29 @@ import (
 type FuncType func(...int) int
 
 func Arity(f interface{}) int {
-    // Get the type of f, which should be a function.
-    fType := reflect.TypeOf(f)
-    if fType.Kind() != reflect.Func {
-        // Optionally, handle the case where f is not a function.
-        return -1
-    }
-    // Return the number of input arguments.
-    return fType.NumIn()
+	// Get the type of f, which should be a function.
+	fType := reflect.TypeOf(f)
+	if fType.Kind() != reflect.Func {
+		// Optionally, handle the case where f is not a function.
+		return -1
+	}
+	// Return the number of input arguments.
+	return fType.NumIn()
 }
-
 
 // returns n as a binary vector, front-padded to pad_to_len
 // The use of ToBits is crucial for generating the necessary input patterns to
-// systematically evaluate the function g over all possible binary input 
+// systematically evaluate the function g over all possible binary input
 // combinations, which is a common requirement in various computational and cryptographic algorithms.
 func ToBits(n int, padToLen int) []int {
-	binStr := strconv.FormatInt(int64(n),2)
+	binStr := strconv.FormatInt(int64(n), 2)
 
 	if len(binStr) > padToLen {
-        padToLen = len(binStr)
-    }
+		padToLen = len(binStr)
+	}
 
 	v := make([]int, len(binStr))
-	for i,ch := range binStr {
+	for i, ch := range binStr {
 		if ch == '1' {
 			v[i] = 1
 		} else {
@@ -42,7 +41,7 @@ func ToBits(n int, padToLen int) []int {
 		}
 	}
 	diff := padToLen - len(v)
-	
+
 	paddedV := make([]int, diff)
 	return append(paddedV, v...)
 }
@@ -50,14 +49,14 @@ func ToBits(n int, padToLen int) []int {
 // DegJ returns the degree of the j'th variable in g
 // Assumes a non-negative integer power less than 10
 // Function is highly specific to the function signature and use case
-func DegJ(g FuncType, j int ) int {
+func DegJ(g FuncType, j int) int {
 	exp := 1
 	for {
 		args := make([]int, 1)
-		for i:= range args {
-			if i==j {
+		for i := range args {
+			if i == j {
 				args[i] = 100
-			}  else {
+			} else {
 				args[i] = 1
 			}
 		}

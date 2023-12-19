@@ -3,14 +3,14 @@ package sumcheck
 import "fmt"
 
 type SumcheckProtocol struct {
-	gArity 		int
-	p		 	*Prover
-	v			*Verifier
-	round 		int
-	done		bool
+	gArity int
+	p      *Prover
+	v      *Verifier
+	round  int
+	done   bool
 }
 
-func NewSumcheckProtocol (g FuncType) *SumcheckProtocol {
+func NewSumcheckProtocol(g FuncType) *SumcheckProtocol {
 	gArity := Arity(g)
 
 	if gArity < 1 {
@@ -22,10 +22,10 @@ func NewSumcheckProtocol (g FuncType) *SumcheckProtocol {
 
 	return &SumcheckProtocol{
 		gArity: gArity,
-		p:		p,
-		v: 		v,
-		round: 	1,
-		done: 	false,
+		p:      p,
+		v:      v,
+		round:  1,
+		done:   false,
 	}
 }
 
@@ -34,7 +34,7 @@ func (s *SumcheckProtocol) String() string {
 }
 
 // Advance protocol by 1 round
-func (s *SumcheckProtocol) AdvanceRound () {
+func (s *SumcheckProtocol) AdvanceRound() {
 	if s.done {
 		panic("Sumcheck protocol is finished")
 	}
@@ -61,4 +61,3 @@ func (s *SumcheckProtocol) AdvanceToEnd(verbose bool) {
 		s.AdvanceRound()
 	}
 }
-

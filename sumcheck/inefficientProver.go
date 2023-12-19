@@ -3,24 +3,24 @@ package sumcheck
 import "fmt"
 
 type InefficientProver struct {
-	g  FuncType
-	gArity int
+	g                FuncType
+	gArity           int
 	randomChallenges []int
-	polynomials 	[]FuncType
-	round 			int
-	H				int
+	polynomials      []FuncType
+	round            int
+	H                int
 }
 
 func NewInefficientProver(g FuncType, gArity int) *InefficientProver {
 	p := &InefficientProver{
-		g:	g,
+		g:      g,
 		gArity: gArity,
-		round:	1,
+		round:  1,
 	}
 
 	var sum int
-	for i:=0; i< (1<<gArity); i++ {
-		args:= ToBits(i, gArity)
+	for i := 0; i < (1 << gArity); i++ {
+		args := ToBits(i, gArity)
 		sum += g(args...)
 	}
 
@@ -28,7 +28,6 @@ func NewInefficientProver(g FuncType, gArity int) *InefficientProver {
 
 	return p
 }
-
 
 func (p *InefficientProver) ComputeAndSendNextPolynomial(v *Verifier) {
 	round := p.round
@@ -38,13 +37,13 @@ func (p *InefficientProver) ComputeAndSendNextPolynomial(v *Verifier) {
 			// Handle the case where no arguments are passed
 			panic("gJ requires at least one argument")
 		}
-		argsInit := append(p.randomChallenges[:round - 1], args[0])
+		argsInit := append(p.randomChallenges[:round-1], args[0])
 		padLen := p.gArity - len(argsInit)
 
 		var sum int
 
-		for i:=0; i< (1<<padLen); i++ {
-			args:= append(argsInit, ToBits(i, padLen)...)
+		for i := 0; i < (1 << padLen); i++ {
+			args := append(argsInit, ToBits(i, padLen)...)
 			sum += p.g(args...)
 		}
 		return sum
