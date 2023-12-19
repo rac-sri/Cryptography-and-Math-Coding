@@ -10,6 +10,9 @@ import (
 type FuncType func(...int) int
 
 // returns n as a binary vector, front-padded to pad_to_len
+// The use of ToBits is crucial for generating the necessary input patterns to
+// systematically evaluate the function g over all possible binary input 
+// combinations, which is a common requirement in various computational and cryptographic algorithms.
 func ToBits(n int, padToLen int) []int {
 	binStr := strconv.FormatInt(int64(n),2)
 	v := make([]int, len(binStr))
