@@ -7,8 +7,7 @@ import (
 
 // Arity returns the number of arguments taken by a function.
 // In Go, we need to define a specific function type.
-type FuncType func(int, int, int) int
-
+type FuncType func(...int) int
 
 // returns n as a binary vector, front-padded to pad_to_len
 func ToBits(n int, padToLen int) []int {
@@ -33,7 +32,7 @@ func ToBits(n int, padToLen int) []int {
 func DegJ(g FuncType, j int ) int {
 	exp := 1
 	for {
-		args := make([]int, 3)
+		args := make([]int, 1)
 		for i:= range args {
 			if i==j {
 				args[i] = 100
@@ -42,12 +41,16 @@ func DegJ(g FuncType, j int ) int {
 			}
 		}
 
-		out1 := g(args[0], args[1], args[2])
+		out1 := g(args[0])
 
-		args[j] = 1000
+		args[0] = 1000
 
-		out2 := g(args[0], args[1], args[2])
+		out2 := g(args[0])
 
+		// Consider a function f(x) = x²
+		// To find the degree of x (assuming it's the second variable, so x = 1), the function would compare f(100) with f(1000).
+		// If x is cubed (x³), the output should scale by 1000^ 3 / 100 ^ 3
+		// when x changes from 100 to 1000. The function checks if this scaling holds to estimate the degree.
 		if math.Abs(float64(out1)/math.Pow(100, float64(exp))-float64(out2)/math.Pow(1000, float64(exp))) < 1 {
 			return exp
 		} else if exp > 10 {

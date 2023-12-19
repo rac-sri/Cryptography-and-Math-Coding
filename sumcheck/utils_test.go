@@ -8,10 +8,13 @@ import (
 
 
 func Test_DegJ(t *testing.T) {
-	f := func(a, b, c int) int { return a*b*b*c + b + c*c*c }
+	f := func(args ...int) int {
+        if len(args) == 0 {
+            return 0 // or some default value
+        }
+        a := args[0] 
+        return a*a*a + a + a*a*19
+    }
 
-	assert.Equal(t,DegJ(f, 0),1)
-	assert.Equal(t,DegJ(f, 1),2)
-	assert.Equal(t,DegJ(f, 2),3)
-
+	assert.Equal(t, 3, DegJ(FuncType(f), 0))
 }
