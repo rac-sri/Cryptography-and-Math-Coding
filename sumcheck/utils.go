@@ -28,6 +28,11 @@ func Arity(f interface{}) int {
 // combinations, which is a common requirement in various computational and cryptographic algorithms.
 func ToBits(n int, padToLen int) []int {
 	binStr := strconv.FormatInt(int64(n),2)
+
+	if len(binStr) > padToLen {
+        padToLen = len(binStr)
+    }
+
 	v := make([]int, len(binStr))
 	for i,ch := range binStr {
 		if ch == '1' {
@@ -36,8 +41,8 @@ func ToBits(n int, padToLen int) []int {
 			v[i] = 0
 		}
 	}
-
 	diff := padToLen - len(v)
+	
 	paddedV := make([]int, diff)
 	return append(paddedV, v...)
 }

@@ -1,13 +1,18 @@
 package sumcheck
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestSumcheck(t *testing.T) {
+	
 	g := func(args ...int) int 	{ 
 		a := args[0]
 		return a + a + a*a }
 
 	protocol := NewSumcheckProtocol(g)
+	fmt.Print(protocol)
 	protocol.AdvanceToEnd(true)
 
 	f := func(args ...int) int { 	

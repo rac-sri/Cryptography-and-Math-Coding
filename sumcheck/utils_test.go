@@ -7,7 +7,7 @@ import (
 )
 
 
-func Test_DegJ(t *testing.T) {
+func TestDegJ(t *testing.T) {
 	f := func(args ...int) int {
         if len(args) == 0 {
             return 0 // or some default value

@@ -35,6 +35,10 @@ func (p *Prover) ComputeAndSendNextPolynomial(v *Verifier) {
 	poly := p.cachedPolynomials[len(p.cachedPolynomials)-1]
 
 	gJ := func (args ...int) int {
+		if len(args) == 0 {
+			// Handle the case where no arguments are passed
+			panic("gJ requires at least one argument")
+		}
 		pad := p.gArity - round
 		var sum int
 		for i:= 0; i< (1<<pad); i++ {

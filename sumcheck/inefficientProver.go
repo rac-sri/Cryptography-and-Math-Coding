@@ -34,6 +34,10 @@ func (p *InefficientProver) ComputeAndSendNextPolynomial(v *Verifier) {
 	round := p.round
 
 	gJ := func(args ...int) int {
+		if len(args) == 0 {
+			// Handle the case where no arguments are passed
+			panic("gJ requires at least one argument")
+		}
 		argsInit := append(p.randomChallenges[:round - 1], args[0])
 		padLen := p.gArity - len(argsInit)
 
