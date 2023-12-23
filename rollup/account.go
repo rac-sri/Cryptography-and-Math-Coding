@@ -5,8 +5,6 @@ import (
 
 	"github.com/consensys/gnark-crypto/ecc/bn254/fr"
 	"github.com/consensys/gnark-crypto/ecc/bn254/twistededwards/eddsa"
-	"github.com/consensys/gnark-crypto/ecc/bw6-756/fr"
-	"github.com/consensys/gnark-crypto/ecc/bw6-756/twistededwards/eddsa"
 )
 
 var (
