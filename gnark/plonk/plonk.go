@@ -27,11 +27,11 @@ func (circuit *Circuit) Define(api frontend.API) error {
 	output := frontend.Variable(1)
 	bits := api.ToBinary(circuit.E, bitSize)
 
-	for i:=0; i<len(bits); i++ {
+	for i := 0; i < len(bits); i++ {
 		api.Println(fmt.Sprintf("e[%d]", i), bits[i])
 
-		if i!= 0 {
-			output = api.Mul(output,output)
+		if i != 0 {
+			output = api.Mul(output, output)
 		}
 
 		multiply := api.Mul(output, circuit.X)
@@ -60,18 +60,18 @@ func main() {
 	// correct data: proof passes
 	{
 		// witness instantiation. Witness known only by the prover
-		// while public w is a public data konwn by the verifier
+		// while public w is a public data known by the verifier
 		var w Circuit
 		w.X = 2
 		w.E = 2
 		w.Y = 4
 
 		witnessFull, err := frontend.NewWitness(&w, ecc.BN254.ScalerField())
-		if err!= nil {
+		if err != nil {
 			log.Fatal(err)
 		}
 
-		witnessPublic, err:= frontend.NewWitness(&w, ecc.BN256.ScalerField(), frontend.PublicOnly())
+		witnessPublic, err := frontend.NewWitness(&w, ecc.BN256.ScalerField(), frontend.PublicOnly())
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -79,9 +79,9 @@ func main() {
 		// public data consists for the polynomials describing the constants involved
 		// in the constaints, the polynomial descibing the permutation ("grand product argument")
 		// and the FFT domains
-		pk, vk, err := plonk.Setup(ccs,srs, srsLagrange)
+		pk, vk, err := plonk.Setup(ccs, srs, srsLagrange)
 
-		if err!= nil {
+		if err != nil {
 			log.Fatal(err)
 		}
 
@@ -116,7 +116,7 @@ func main() {
 
 		witnessPublic, err := frontend.NewWitness(&pW, ecc.BN254.ScalerField(), frontend.PublicOnly())
 
-		if err!= nil {
+		if err != nil {
 			log.Fatal(err)
 		}
 
