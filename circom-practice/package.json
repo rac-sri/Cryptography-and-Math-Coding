@@ -1,0 +1,11 @@
+{
+  "name": "hardhat-project",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.3"
+  },
+  "dependencies": {
+    "circomlib": "^2.0.5",
+    "hardhat-circom": "^3.3.2"
+  }
+}
