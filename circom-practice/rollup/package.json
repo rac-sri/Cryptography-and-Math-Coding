@@ -1,13 +1,13 @@
 {
-  "name": "voting",
+  "name": "rollup",
   "version": "0.0.1",
-  "description": "Voting",
+  "description": "rollup",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "voting",
+    "rollup",
     "zksnark"
   ],
   "license": "GPL-3.0",

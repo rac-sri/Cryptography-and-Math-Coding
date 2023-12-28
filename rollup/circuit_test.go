@@ -1,58 +1,254 @@
-pragma circom 2.0.0;
+package rollup
 
-include "../node_modules/circomlib/circuits/switcher.circom";
-include "../node_modules/circomlib/circuits/poseidon.circom";
-include "../node_modules/circomlib/circuits/bitify.circom";
+import (
+	"testing"
 
-template Mkt2VerifierLevel() {
-    signal input sibling;
-    signal input low;
-    signal input selector;
-    signal output root;
+	"github.com/consensys/gnark-crypto/ecc"
+	"github.com/consensys/gnark/backend"
+	"github.com/consensys/gnark/frontend"
+	"github.com/consensys/gnark/std/hash/mimc"
+	"github.com/consensys/gnark/test"
+)
 
-    component sw = Switcher();
-    component hash = Poseidon(2);
+type circuitSignature Circuit
 
-    sw.sel <== selector;
-    sw.L <== low;
-    sw.R <== sibling;
-
-    log(44444444444);
-    log(sw.outL);
-    log(sw.outR);
-
-    hash.inputs[0] <== sw.outL;
-    hash.inputs[1] <== sw.outR;
-
-    root <== hash.out;
+// Circuit implements par tof the rollup circuit by declaring a subset of the constaints
+func (t *circuitSignature) Define(api frontend.API) error {
+	if err := (*Circuit)(t).postInit(api); err != nil {
+		return err
+	}
+	hFunc, err := mimc.NewMiMC(api)
+	if err != nil {
+		return err
+	}
+	return verifyTransferSignature(api, t.Transfers[0], hFunc)
 }
 
-template Mkt2Verifier(nLevels) {
+func TestCircuitSignature(t *testing.T) {
+	const nbAccounts = 10
 
-    signal input key;
-    signal input value;
-    signal input root;
-    signal input siblings[nLevels];
+	operator, users := createOperator(nbAccounts)
 
-    component n2b = Num2Bits(nLevels);
-    component levels[nLevels];
+	// read accounts involved in the transfer
+	sender, err := operator.readAccount(0)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-    component hashV = Poseidon(1);
+	receiver, err := operator.readAccount(1)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-    hashV.inputs[0] <== value;
+	// create the transfer and sign it
+	amount := uint64(10)
+	transfer := NewTransfer(amount, sender.pubKey, receiver.pubKey, sender.nonce)
 
-    n2b.in <== key;
+	// sign the transfer
+	_, err = transfer.Sign(users[0], operator.h)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-    for (var i=nLevels-1; i>=0; i--) {
-        levels[i] = Mkt2VerifierLevel();
-        levels[i].sibling <== siblings[i];
-        levels[i].selector <== n2b.out[i];
-        if (i==nLevels-1) {
-            levels[i].low <== hashV.out;
-        } else {
-            levels[i].low <== levels[i+1].root;
-        }
-    }
+	// update the state from the received transfer
+	err = operator.updateState(transfer, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-    root === levels[0].root;
+	// verifies the signature of the transfer
+	assert := test.NewAssert(t)
+
+	var signatureCircuit circuitSignature
+	for i := 0; i < BatchSizeCircuit; i++ {
+		signatureCircuit.MerkleProofReceiverBefore[i].Path = make([]frontend.Variable, depth)
+		signatureCircuit.MerkleProofReceiverAfter[i].Path = make([]frontend.Variable, depth)
+		signatureCircuit.MerkleProofSenderBefore[i].Path = make([]frontend.Variable, depth)
+		signatureCircuit.MerkleProofSenderAfter[i].Path = make([]frontend.Variable, depth)
+	}
+
+	assert.ProverSucceeded(&signatureCircuit, &operator.witnesses, test.WithCurves(ecc.BN254), test.WithCompileOpts(frontend.IgnoreUnconstrainedInputs()))
+}
+
+type circuitInclusionProof Circuit
+
+func (t *circuitInclusionProof) Define(api frontend.API) error {
+
+	hashFunc, err := mimc.NewMiMC(api)
+	if err != nil {
+		return err
+	}
+
+	t.MerkleProofReceiverBefore[0].VerifyProof(api, &hashFunc, t.LeafReceiver[0])
+	t.MerkleProofReceiverAfter[0].VerifyProof(api, &hashFunc, t.LeafReceiver[0])
+	t.MerkleProofSenderBefore[0].VerifyProof(api, &hashFunc, t.LeafSender[0])
+	t.MerkleProofSenderAfter[0].VerifyProof(api, &hashFunc, t.LeafSender[0])
+
+	return nil
+}
+
+func TestCircuitInclusionProof(t *testing.T) {
+
+	if testing.Short() {
+		t.Skip("skipping rollup tests for circleCI")
+	}
+
+	operator, users := createOperator(nbAccounts)
+
+	// read accounts involved in the transfer
+	sender, err := operator.readAccount(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	receiver, err := operator.readAccount(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// create the transfer and sign it
+	amount := uint64(16)
+	transfer := NewTransfer(amount, sender.pubKey, receiver.pubKey, sender.nonce)
+
+	// sign the transfer
+	_, err = transfer.Sign(users[0], operator.h)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// update the state from the received transfer
+	err = operator.updateState(transfer, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// verifies the proofs of inclusion of the transfer
+	assert := test.NewAssert(t)
+
+	// we allocate the slices of the circuit before compiling it
+	var inclusionProofCircuit circuitInclusionProof
+	for i := 0; i < BatchSizeCircuit; i++ {
+		inclusionProofCircuit.MerkleProofReceiverBefore[i].Path = make([]frontend.Variable, depth)
+		inclusionProofCircuit.MerkleProofReceiverAfter[i].Path = make([]frontend.Variable, depth)
+		inclusionProofCircuit.MerkleProofSenderBefore[i].Path = make([]frontend.Variable, depth)
+		inclusionProofCircuit.MerkleProofSenderAfter[i].Path = make([]frontend.Variable, depth)
+	}
+
+	assert.ProverSucceeded(
+		&inclusionProofCircuit,
+		&operator.witnesses,
+		test.WithCurves(ecc.BN254),
+		test.WithCompileOpts(frontend.IgnoreUnconstrainedInputs()),
+		test.WithBackends(backend.GROTH16))
+
+}
+
+type circuitUpdateAccount Circuit
+
+// Circuit implements part of the rollup circuit only by delcaring a subset of the constraints
+func (t *circuitUpdateAccount) Define(api frontend.API) error {
+
+	if err := (*Circuit)(t).postInit(api); err != nil {
+		return err
+	}
+
+	verifyAccountUpdated(api, t.SenderAccountsBefore[0], t.ReceiverAccountsBefore[0],
+		t.SenderAccountsAfter[0], t.ReceiverAccountsAfter[0], t.Transfers[0].Amount)
+	return nil
+}
+
+func TestCircuitUpdateAccount(t *testing.T) {
+
+	if testing.Short() {
+		t.Skip("skipping rollup tests for circleCI")
+	}
+
+	operator, users := createOperator(nbAccounts)
+
+	// read accounts involved in the transfer
+	sender, err := operator.readAccount(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	receiver, err := operator.readAccount(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// create the transfer and sign it
+	amount := uint64(10)
+	transfer := NewTransfer(amount, sender.pubKey, receiver.pubKey, sender.nonce)
+
+	// sign the transfer
+	_, err = transfer.Sign(users[0], operator.h)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// update the state from the received transfer
+	err = operator.updateState(transfer, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert := test.NewAssert(t)
+
+	var updateAccountCircuit circuitUpdateAccount
+	(*Circuit)(&updateAccountCircuit).allocateSlicesMerkleProofs()
+
+	assert.ProverSucceeded(&updateAccountCircuit, &operator.witnesses, test.WithCurves(ecc.BN254), test.WithCompileOpts(frontend.IgnoreUnconstrainedInputs()))
+
+}
+
+func TestCircuitFull(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping rollup tests for circle CI")
+	}
+
+	operator, users := createOperator(nbAccounts)
+
+	sender, err := operator.readAccount(0)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	receiver, err := operator.readAccount(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// create the transfer and sign it
+
+	amount := uint64(10)
+	transfer := NewTransfer(amount, sender.pubKey, receiver.pubKey, sender.nonce)
+
+	// sign the transfer
+	_, err = transfer.Sign(users[0], operator.h)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// update the state from the received transfer
+	err = operator.updateState(transfer, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert := test.NewAssert(t)
+
+	var rollupCircuit Circuit
+	for i := 0; i < BatchSizeCircuit; i++ {
+		rollupCircuit.MerkleProofReceiverBefore[i].Path = make([]frontend.Variable, depth)
+		rollupCircuit.MerkleProofReceiverAfter[i].Path = make([]frontend.Variable, depth)
+		rollupCircuit.MerkleProofSenderBefore[i].Path = make([]frontend.Variable, depth)
+		rollupCircuit.MerkleProofSenderAfter[i].Path = make([]frontend.Variable, depth)
+	}
+
+	assert.ProverSucceeded(
+		&rollupCircuit,
+		&operator.witnesses,
+		test.WithCurves(ecc.BN254),
+		test.WithBackends(backend.GROTH16))
+
 }
