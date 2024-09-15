@@ -1,10 +1,12 @@
-mod EoverQ;
-mod EoverRealField;
 mod e_over_finite_fields;
+mod eover_q;
+mod eover_real_field;
+mod projective_point;
 
 use e_over_finite_fields::run as e_over_finite_fields;
-use EoverQ::run as addElipticCurvePoints;
-use EoverRealField::run as addOverRings;
+use eover_q::run as addElipticCurvePoints;
+use eover_real_field::run as addOverRings;
+use projective_point::run as projective_point;
 
 fn main() {
     println!("Some cryptography ....");
@@ -14,4 +16,6 @@ fn main() {
     addOverRings();
     println!("\nE over finite field of 11...");
     e_over_finite_fields();
+    println!("\n Checking if two points in affine space are isomorphic in Projectile Space in field of 41....");
+    projective_point();
 }
