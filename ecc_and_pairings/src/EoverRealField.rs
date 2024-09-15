@@ -129,7 +129,7 @@ fn roots(poly: &Polynomial) -> Vec<f64> {
 
 pub fn run() {
     let f = Polynomial::new(vec![0.0, -2.0, 0.0, 1.0]); // x^3 - 2x
-    let e = EllipticCurve::new(-2.0, 0.0);
+    let e = EllipticCurve::new(-2.0, 0.0); // E: y^2 = x^3 + ax + b
 
     let p1 = Point { x: -1.0, y: -1.0 };
     let p2 = Point { x: 0.0, y: 0.0 };
