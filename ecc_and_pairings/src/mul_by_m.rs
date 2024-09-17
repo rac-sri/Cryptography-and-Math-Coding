@@ -130,6 +130,39 @@ impl EllipticCurve {
 
         Point { x, y }
     }
+
+    //     How the Double-and-Add Algorithm Works
+    // The algorithm is analogous to the way binary numbers are used in multiplication. Here’s a step-by-step explanation:
+
+    // Binary Representation of the Scalar: The integer
+    // 𝑚
+    // m is first converted into its binary representation. For example, if
+    // 𝑚
+    // =
+    // 13
+    // m=13, its binary representation is 1101.
+
+    // Initialization:
+
+    // Initialize R to the identity element (point at infinity) of the elliptic curve.
+    // Set a variable temp to the point
+    // 𝑃
+    // P (the point you want to multiply).
+    // Process Each Bit: Iterate through each bit of the binary representation of
+    // 𝑚
+    // m, starting from the most significant bit (MSB) to the least significant bit (LSB).
+
+    // For each bit:
+
+    // Double Operation: Regardless of the bit value, double the current result point R. This corresponds to shifting left in binary multiplication.
+    // Add Operation: If the current bit is 1, add the point temp to R. This corresponds to adding the point in binary multiplication when the bit is 1.
+    // Update the Point:
+
+    // After processing all bits, R will contain the result of
+    // 𝑚
+    // 𝑃
+    // mP.
+
     fn scalar(&self, m: i32, p: &Point) -> Point {
         let mut r = p.clone(); // Initialize r with the point p itself
         let mut first_bit = false;
