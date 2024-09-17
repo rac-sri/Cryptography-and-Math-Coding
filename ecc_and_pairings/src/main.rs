@@ -1,13 +1,16 @@
+mod e_over_f23_generalised;
 mod e_over_finite_fields;
 mod eover_q;
 mod eover_real_field;
+mod mul_by_m;
 mod projective_point;
 
+use e_over_f23_generalised::run as e_over_f23_generalised;
 use e_over_finite_fields::run as e_over_finite_fields;
 use eover_q::run as addElipticCurvePoints;
 use eover_real_field::run as addOverRings;
+use mul_by_m::run as mul_by_m;
 use projective_point::run as projective_point;
-
 fn main() {
     println!("Some cryptography ....");
     println!("\nAdd Eliptic curve points...");
@@ -18,4 +21,10 @@ fn main() {
     e_over_finite_fields();
     println!("\n Checking if two points in affine space are isomorphic in Projectile Space in field of 41....");
     projective_point();
+
+    println!("\n P+Q using generalised formula.....");
+    e_over_f23_generalised();
+
+    println!("\n [m]P.....");
+    mul_by_m();
 }
