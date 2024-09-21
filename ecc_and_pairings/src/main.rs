@@ -2,6 +2,7 @@ mod char_frob;
 mod e_count_points;
 mod e_over_f23_generalised;
 mod e_over_finite_fields;
+mod elliptic_cirve_divison_poly_and_root_finding;
 mod endomorphis_extension_field;
 mod eover_q;
 mod eover_real_field;
@@ -12,6 +13,7 @@ use char_frob::run as char_frob;
 use e_count_points::run as e_count_points;
 use e_over_f23_generalised::run as e_over_f23_generalised;
 use e_over_finite_fields::run as e_over_finite_fields;
+use elliptic_cirve_divison_poly_and_root_finding::run as elliptic_cirve_divison_poly_and_root_finding;
 use endomorphis_extension_field::run as endomorphis_extension_field;
 use eover_q::run as addElipticCurvePoints;
 use eover_real_field::run as addOverRings;
@@ -40,6 +42,10 @@ fn main() {
     println!("\n Extension fields.....");
     endomorphis_extension_field();
 
-    println!("\n Charcater and Frobenius Map.....");
+    println!("\n Character and Frobenius Map.....");
     char_frob();
+
+    // incorrect output. Fix is todo ( bug: divsor polynomial calculation is wrong )
+    // println!("\n Division polynomial calculation and roots.....");
+    // elliptic_cirve_divison_poly_and_root_finding();
 }

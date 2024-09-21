@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+ark-ec = "0.4.2"
+ark-ff = "0.4.2"
+ark-std = "0.4.0"
 num-bigint = "0.4.6"
 num-integer = "0.1.46"
 num-rational = "0.4.2"
