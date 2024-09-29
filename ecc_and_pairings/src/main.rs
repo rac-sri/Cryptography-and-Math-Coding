@@ -50,6 +50,7 @@ fn main() {
     // println!("\n Division polynomial calculation and roots.....");
     // elliptic_cirve_divison_poly_and_root_finding();
 
-    println!("Reduction of divisors...");
-    reduction();
+    // TODO: Bug fix can fail on some runs due to randome numbers being used causing pancics sometimes or sometimes computation keeps going if random number causes a huge amount of compuation.)
+    // println!("Reduction of divisors.... ");
+    // reduction();
 }

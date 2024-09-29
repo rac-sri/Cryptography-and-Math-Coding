@@ -291,6 +291,7 @@ impl FunctionFieldElement {
     }
 }
 
+// langrange polynomial
 fn interpolate(x_coords: &[FieldElement], y_coords: &[FieldElement]) -> Polynomial {
     assert_eq!(x_coords.len(), y_coords.len());
     let n = x_coords.len();
