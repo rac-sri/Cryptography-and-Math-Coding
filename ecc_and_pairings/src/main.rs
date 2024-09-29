@@ -8,7 +8,7 @@ mod eover_q;
 mod eover_real_field;
 mod mul_by_m;
 mod projective_point;
-
+mod reduction;
 use char_frob::run as char_frob;
 use e_count_points::run as e_count_points;
 use e_over_f23_generalised::run as e_over_f23_generalised;
@@ -19,6 +19,7 @@ use eover_q::run as addElipticCurvePoints;
 use eover_real_field::run as addOverRings;
 use mul_by_m::run as mul_by_m;
 use projective_point::run as projective_point;
+use reduction::run as reduction;
 fn main() {
     println!("Some cryptography ....");
     println!("\nAdd Eliptic curve points...");
@@ -48,4 +49,7 @@ fn main() {
     // incorrect output. Fix is todo ( bug: divsor polynomial calculation is wrong )
     // println!("\n Division polynomial calculation and roots.....");
     // elliptic_cirve_divison_poly_and_root_finding();
+
+    println!("Reduction of divisors...");
+    reduction();
 }
