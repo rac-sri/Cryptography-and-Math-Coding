@@ -8,6 +8,7 @@ mod eover_q;
 mod eover_real_field;
 mod mul_by_m;
 mod projective_point;
+mod r_torsion_curve_flower;
 mod reduction;
 use char_frob::run as char_frob;
 use e_count_points::run as e_count_points;
@@ -19,6 +20,7 @@ use eover_q::run as addElipticCurvePoints;
 use eover_real_field::run as addOverRings;
 use mul_by_m::run as mul_by_m;
 use projective_point::run as projective_point;
+use r_torsion_curve_flower::run as r_torsion_curve_flower;
 use reduction::run as reduction;
 fn main() {
     println!("Some cryptography ....");
@@ -53,4 +55,7 @@ fn main() {
     // TODO: Bug fix can fail on some runs due to randome numbers being used causing pancics sometimes or sometimes computation keeps going if random number causes a huge amount of compuation.)
     // println!("Reduction of divisors.... ");
     // reduction();
+
+    println!("r torsion flowers...");
+    r_torsion_curve_flower();
 }
