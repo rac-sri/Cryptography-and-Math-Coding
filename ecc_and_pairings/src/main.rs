@@ -10,6 +10,7 @@ mod mul_by_m;
 mod projective_point;
 mod r_torsion_curve_flower;
 mod reduction;
+mod twisted_curves;
 use char_frob::run as char_frob;
 use e_count_points::run as e_count_points;
 use e_over_f23_generalised::run as e_over_f23_generalised;
@@ -22,6 +23,7 @@ use mul_by_m::run as mul_by_m;
 use projective_point::run as projective_point;
 use r_torsion_curve_flower::run as r_torsion_curve_flower;
 use reduction::run as reduction;
+use twisted_curves::run as twisted_curves;
 fn main() {
     println!("Some cryptography ....");
     println!("\nAdd Eliptic curve points...");
@@ -56,6 +58,9 @@ fn main() {
     // println!("Reduction of divisors.... ");
     // reduction();
 
-    println!("r torsion flowers...");
-    r_torsion_curve_flower();
+    // println!("\n r torsion flowers...");
+    // r_torsion_curve_flower();
+
+    println!("\n Twisted curves....");
+    twisted_curves();
 }
