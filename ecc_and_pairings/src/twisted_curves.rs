@@ -400,5 +400,6 @@ pub fn run() {
     println!("Twisted point: {:?}", twisted);
     let untwisted = curve_twist.untwist(&twisted, &u);
     println!("Untwisted point: {:?}", untwisted);
+    // TODO: fix
     // assert_eq!(*random_point, untwisted);
 }
